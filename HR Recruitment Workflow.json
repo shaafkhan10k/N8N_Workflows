@@ -1,0 +1,2601 @@
+{
+  "name": "HR Recruitment Workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "bb8a1e3b-600b-48a5-8c99-5c48b01eec56",
+      "name": "Run HR Screening",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -5680,
+        2336
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "mode": "list"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1555890533
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Processed",
+              "lookupValue": "FALSE"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "89b3c4b4-c91a-4435-a7db-08c77aa388d4",
+      "name": "Read Master Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -5680,
+        2160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "cf7e7563-40b1-48aa-82d9-b6e5757b923b",
+      "name": "All Candidates Processed",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -5568,
+        1424
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Ai-ML Engineer"
+        },
+        "options": {}
+      },
+      "id": "94b0c514-79dc-4e16-bd70-ae649039a483",
+      "name": "Read Ai / ML Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -5424,
+        1424
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "Score",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "82b9366b-9227-489f-b66c-f23ca62aa076",
+      "name": "Sort Ai / ML",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        -5296,
+        1424
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "id": "05ab13ee-fb25-4ce0-844e-1d39d5f1e57d",
+      "name": "Top 3 Ai / ML",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -5152,
+        1424
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\nconst role = 'Ai / ML Engineer';\nif (!items.length) { return [{ json: { role, skip: true } }]; }\nconst rows = items.map((c, i) => `<tr><td>${i + 1}</td><td>${c.Name || ''}</td><td>${c.Email || ''}</td><td>${c.Score || ''}</td><td>${c.GPA || ''}</td><td>${(c['Overall Reasoning'] || '').slice(0, 300)}</td></tr>`).join('');\nconst html = `<h2>Top candidates - ${role}</h2><p>Top ${items.length} by score (manual review required, no automatic winner).</p><table border=\"1\" cellpadding=\"6\" cellspacing=\"0\"><tr><th>#</th><th>Name</th><th>Email</th><th>Score</th><th>GPA</th><th>Reasoning</th></tr>${rows}</table>`;\nreturn [{ json: { role, skip: false, subject: `[HR] Top candidates - ${role}`, html } }];"
+      },
+      "id": "d28b938c-b1c9-40dd-a69d-2dad54e6a94b",
+      "name": "Digest Ai / ML",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5536,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "hiring-team@example.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "250d7389-f270-497b-9c30-a15abb3fe08f",
+      "name": "Email Ai / ML",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -5200,
+        1584
+      ],
+      "webhookId": "de54dbda-ce6f-4303-8aba-c58fa09223ec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sa9oA5RWMLTFqcBT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Full Stack Web Development"
+        },
+        "options": {}
+      },
+      "id": "18c16351-d330-4eb2-8f13-14dcbd90f47c",
+      "name": "Read Full Stack Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -5072,
+        1584
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "Score",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "66d12bfc-8d18-4544-b807-ccf66dea91cb",
+      "name": "Sort Full Stack",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        -4944,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "id": "420357c8-e2b5-4326-aabb-2cd8bc5a3039",
+      "name": "Top 3 Full Stack",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -4800,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\nconst role = 'Full Stack Web Development';\nif (!items.length) { return [{ json: { role, skip: true } }]; }\nconst rows = items.map((c, i) => `<tr><td>${i + 1}</td><td>${c.Name || ''}</td><td>${c.Email || ''}</td><td>${c.Score || ''}</td><td>${c.GPA || ''}</td><td>${(c['Overall Reasoning'] || '').slice(0, 300)}</td></tr>`).join('');\nconst html = `<h2>Top candidates - ${role}</h2><p>Top ${items.length} by score (manual review required, no automatic winner).</p><table border=\"1\" cellpadding=\"6\" cellspacing=\"0\"><tr><th>#</th><th>Name</th><th>Email</th><th>Score</th><th>GPA</th><th>Reasoning</th></tr>${rows}</table>`;\nreturn [{ json: { role, skip: false, subject: `[HR] Top candidates - ${role}`, html } }];"
+      },
+      "id": "24f148ed-793a-41cd-96c8-150ce2e0f828",
+      "name": "Digest Full Stack",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4640,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "hiring-team@example.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "d6437538-fbc9-4311-a427-e30b5a2a23ca",
+      "name": "Email Full Stack",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -3952,
+        2032
+      ],
+      "webhookId": "cda3e374-e22c-4860-9d21-8580c39dfaca",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sa9oA5RWMLTFqcBT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Vedio Editing"
+        },
+        "options": {}
+      },
+      "id": "93f7de5e-61fc-428b-ab70-d55d8ed28f7e",
+      "name": "Read Video Editing Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3792,
+        2032
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "Score",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7f748887-88e0-4015-8baa-9287bea1e77a",
+      "name": "Sort Video Editing",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        -3648,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "id": "98063641-1705-4618-9465-e4c95dfb0879",
+      "name": "Top 3 Video Editing",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -3504,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\nconst role = 'Vedio Editing';\nif (!items.length) { return [{ json: { role, skip: true } }]; }\nconst rows = items.map((c, i) => `<tr><td>${i + 1}</td><td>${c.Name || ''}</td><td>${c.Email || ''}</td><td>${c.Score || ''}</td><td>${c.GPA || ''}</td><td>${(c['Overall Reasoning'] || '').slice(0, 300)}</td></tr>`).join('');\nconst html = `<h2>Top candidates - ${role}</h2><p>Top ${items.length} by score (manual review required, no automatic winner).</p><table border=\"1\" cellpadding=\"6\" cellspacing=\"0\"><tr><th>#</th><th>Name</th><th>Email</th><th>Score</th><th>GPA</th><th>Reasoning</th></tr>${rows}</table>`;\nreturn [{ json: { role, skip: false, subject: `[HR] Top candidates - ${role}`, html } }];"
+      },
+      "id": "71e9848b-0112-4e08-9415-0d10b41cdac1",
+      "name": "Digest Video Editing",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3344,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "hiring-team@example.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "8a0ad694-cca0-4d36-b706-44e9563e3b47",
+      "name": "Email Video Editing",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -3952,
+        2240
+      ],
+      "webhookId": "460b8535-bc7a-4082-970d-4c949608e901",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sa9oA5RWMLTFqcBT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Game Development"
+        },
+        "options": {}
+      },
+      "id": "22ae19b8-0f77-4064-b74d-a50d3c178346",
+      "name": "Read Game Dev Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3808,
+        2240
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "Score",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "0935c62c-77e2-420c-bd90-f5f8185a6d34",
+      "name": "Sort Game Dev",
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        -3648,
+        2240
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 3
+      },
+      "id": "8b34a0b2-489f-4239-8aa2-2f76e8001646",
+      "name": "Top 3 Game Dev",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -3504,
+        2240
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\nconst role = 'Game Development';\nif (!items.length) { return [{ json: { role, skip: true } }]; }\nconst rows = items.map((c, i) => `<tr><td>${i + 1}</td><td>${c.Name || ''}</td><td>${c.Email || ''}</td><td>${c.Score || ''}</td><td>${c.GPA || ''}</td><td>${(c['Overall Reasoning'] || '').slice(0, 300)}</td></tr>`).join('');\nconst html = `<h2>Top candidates - ${role}</h2><p>Top ${items.length} by score (manual review required, no automatic winner).</p><table border=\"1\" cellpadding=\"6\" cellspacing=\"0\"><tr><th>#</th><th>Name</th><th>Email</th><th>Score</th><th>GPA</th><th>Reasoning</th></tr>${rows}</table>`;\nreturn [{ json: { role, skip: false, subject: `[HR] Top candidates - ${role}`, html } }];"
+      },
+      "id": "8c8e2a18-3962-468e-a3de-92c56231ed1e",
+      "name": "Digest Game Dev",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3328,
+        2240
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "hiring-team@example.com",
+        "subject": "={{ $json.subject }}",
+        "message": "={{ $json.html }}",
+        "options": {}
+      },
+      "id": "fc2c60a8-739a-4ec0-80ed-a363bbb5fa7c",
+      "name": "Email Game Dev",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -3952,
+        2464
+      ],
+      "webhookId": "06e808c5-8203-47c8-9491-df7806747638",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sa9oA5RWMLTFqcBT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "mode": "url",
+          "value": "={{ $('Loop Over Candidates').item.json['CV Link'] }}"
+        },
+        "options": {
+          "binaryPropertyName": "cv"
+        }
+      },
+      "id": "ec442de8-44e6-4597-a1c3-2a9058e7cc9f",
+      "name": "Download CV",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -5504,
+        2016
+      ],
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "b2Yg1FudmF1YSE3F",
+          "name": "Google Drive account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "cv",
+        "options": {}
+      },
+      "id": "92b320db-2fdb-40b1-a6dc-b2c38acbda84",
+      "name": "Extract CV Text",
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -5360,
+        2016
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "url": "={{ 'https://api.github.com/users/' + ($('Loop Over Candidates').item.json['GitHub URL'] || '').split('/').filter(s => s).pop() + '/repos?per_page=100&sort=updated' }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "githubApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "n8n-hr-screening"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "80f4aea9-b584-4a33-8b75-581c168b4f62",
+      "name": "Get GitHub Repos",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -5216,
+        2016
+      ],
+      "credentials": {
+        "githubApi": {
+          "id": "WZWKrnU2kUqM2bbC",
+          "name": "GitHub account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const repos = Array.isArray($json) ? $json : ($json.body || []);\nlet summary = 'No public repositories found.';\nif (Array.isArray(repos) && repos.length) {\n  const top = repos\n    .filter(r => !r.fork)\n    .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0))\n    .slice(0, 15)\n    .map(r => `- ${r.name} (${r.language || 'n/a'}, star ${r.stargazers_count || 0}): ${(r.description || '').slice(0, 120)}`);\n  const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];\n  summary = `Public repos: ${repos.length}. Languages: ${langs.join(', ') || 'n/a'}.\\nTop repos:\\n${top.join('\\n')}`;\n}\nreturn [{ json: { github_summary: summary } }];"
+      },
+      "id": "1c15a862-0082-4700-9ea8-3e127f4e6922",
+      "name": "Summarize GitHub",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5056,
+        2016
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $('Loop Over Candidates').item.json['GPA'] }}",
+              "rightValue": 3,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "20814f10-fc78-4a64-9dad-82c09f3e1839",
+      "name": "GPA >= 3?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4912,
+        2016
+      ]
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-20250514",
+          "cachedResultName": "Claude Sonnet 4"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "={{ 'Candidate: ' + $('Loop Over Candidates').item.json['Name'] +\n'\\nRole applied for: ' + $('Loop Over Candidates').item.json['Role Applied For'] +\n'\\nGPA: ' + $('Loop Over Candidates').item.json['GPA'] +\n'\\nLinkedIn (reference only, not scraped): ' + ($('Loop Over Candidates').item.json['LinkedIn URL'] || 'n/a') +\n'\\n\\n=== CV TEXT ===\\n' + ($('Extract CV Text').item.json.text || 'CV could not be extracted.') +\n'\\n\\n=== GITHUB SIGNAL ===\\n' + $json.github_summary }}"
+            }
+          ]
+        },
+        "options": {
+          "includeMergedResponse": true,
+          "system": "You are an expert technical recruiter. Score a candidate for the role they applied to.\nWeighting: CV fit 40%, GitHub 30%, GPA 20%, presentation/communication 10%.\nReturn ONLY strict minified JSON, no markdown, no code fences, with exactly these keys:\n{\"score\": <number 0-100>, \"cv_fit_notes\": \"<string>\", \"github_notes\": \"<string>\", \"gpa_contribution\": \"<string>\", \"overall_reasoning\": \"<string>\"}",
+          "maxTokens": 1500,
+          "temperature": 0
+        }
+      },
+      "id": "f05df7ec-0468-4124-a1bc-a53bd4361c24",
+      "name": "Score Candidate",
+      "type": "@n8n/n8n-nodes-langchain.anthropic",
+      "typeVersion": 1,
+      "position": [
+        -4704,
+        2000
+      ],
+      "credentials": {
+        "anthropicApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $json.merged_response || ($json.content && $json.content[0] && $json.content[0].text) || '';\nlet parsed = {};\ntry {\n  const cleaned = String(raw).replace(/```json/gi, '').replace(/```/g, '').trim();\n  const start = cleaned.indexOf('{');\n  const end = cleaned.lastIndexOf('}');\n  parsed = JSON.parse(cleaned.slice(start, end + 1));\n} catch (e) {\n  parsed = { score: 0, cv_fit_notes: 'Parse error', github_notes: '', gpa_contribution: '', overall_reasoning: 'Could not parse model output: ' + String(raw).slice(0, 300) };\n}\nconst c = $('Loop Over Candidates').item.json;\nreturn [{ json: {\n  Name: c['Name'],\n  Email: c['Email'],\n  Phone: c['Phone'] || '',\n  'Role Applied For': c['Role Applied For'],\n  GPA: c['GPA'],\n  'LinkedIn URL': c['LinkedIn URL'] || '',\n  'GitHub URL': c['GitHub URL'] || '',\n  row_number: c['row_number'],\n  score: Number(parsed.score) || 0,\n  cv_fit_notes: parsed.cv_fit_notes || '',\n  github_notes: parsed.github_notes || '',\n  gpa_contribution: parsed.gpa_contribution || '',\n  overall_reasoning: parsed.overall_reasoning || '',\n} }];"
+      },
+      "id": "a5348b8a-f753-49b5-8930-32b58c950215",
+      "name": "Parse Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4400,
+        2000
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Master Response"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "row_number"
+          ],
+          "value": {
+            "row_number": "={{ $json.row_number }}",
+            "Status": "Scored",
+            "Processed": "TRUE"
+          },
+          "schema": [
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "row_number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Status",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processed",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Processed",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "4d558874-7cd3-45f9-80d6-710e3b92e767",
+      "name": "Mark Scored",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4224,
+        2000
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Parse Score').item.json['Role Applied For'] }}",
+                    "rightValue": "Ai / ML Engineer",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Ai / ML Engineer"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Parse Score').item.json['Role Applied For'] }}",
+                    "rightValue": "Full Stack Web Development",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Full Stack Web Development"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Parse Score').item.json['Role Applied For'] }}",
+                    "rightValue": "Vedio Editing",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Vedio Editing"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": false,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 2
+                },
+                "combinator": "and",
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Parse Score').item.json['Role Applied For'] }}",
+                    "rightValue": "Game Development",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Game Development"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "id": "c8c00337-d2a2-42dd-8e2e-3b69a226c21f",
+      "name": "Route by Role",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -4672,
+        2288
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Ai-ML Engineer"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Parse Score').item.json.Name }}",
+            "Email": "={{ $('Parse Score').item.json.Email }}",
+            "Score": "={{ $('Parse Score').item.json.score }}",
+            "GPA": "={{ $('Parse Score').item.json.GPA }}",
+            "CV Fit Notes": "={{ $('Parse Score').item.json.cv_fit_notes }}",
+            "GitHub Notes": "={{ $('Parse Score').item.json.github_notes }}",
+            "GPA Contribution": "={{ $('Parse Score').item.json.gpa_contribution }}",
+            "Overall Reasoning": "={{ $('Parse Score').item.json.overall_reasoning }}",
+            "GitHub URL": "={{ $('Parse Score').item.json['GitHub URL'] }}",
+            "LinkedIn URL": "={{ $('Parse Score').item.json['LinkedIn URL'] }}",
+            "Phone": "={{ $('Parse Score').item.json.Phone }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Name",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Email",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Phone",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Score",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV Fit Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "CV Fit Notes",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GitHub Notes",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA Contribution",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA Contribution",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall Reasoning",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Overall Reasoning",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GitHub URL",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "LinkedIn URL",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "eea391fe-086e-44a3-970a-30c1e97acf1d",
+      "name": "Append to Ai / ML",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -5488,
+        1824
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "2d69938f-f9dd-4242-b8d3-7172edc1248f",
+      "name": "Loop Over Candidates",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -5680,
+        2000
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Full Stack Web Development"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Parse Score').item.json.Name }}",
+            "Email": "={{ $('Parse Score').item.json.Email }}",
+            "Score": "={{ $('Parse Score').item.json.score }}",
+            "GPA": "={{ $('Parse Score').item.json.GPA }}",
+            "CV Fit Notes": "={{ $('Parse Score').item.json.cv_fit_notes }}",
+            "GitHub Notes": "={{ $('Parse Score').item.json.github_notes }}",
+            "GPA Contribution": "={{ $('Parse Score').item.json.gpa_contribution }}",
+            "Overall Reasoning": "={{ $('Parse Score').item.json.overall_reasoning }}",
+            "GitHub URL": "={{ $('Parse Score').item.json['GitHub URL'] }}",
+            "LinkedIn URL": "={{ $('Parse Score').item.json['LinkedIn URL'] }}",
+            "Phone": "={{ $('Parse Score').item.json.Phone }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Name",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Email",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Phone",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Score",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV Fit Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "CV Fit Notes",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GitHub Notes",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA Contribution",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA Contribution",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall Reasoning",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Overall Reasoning",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GitHub URL",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "LinkedIn URL",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "e0fe5973-35a3-406f-852f-e2d1468b9205",
+      "name": "Append to Full Stack",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -5280,
+        1824
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Vedio Editing"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Parse Score').item.json.Name }}",
+            "Email": "={{ $('Parse Score').item.json.Email }}",
+            "Score": "={{ $('Parse Score').item.json.score }}",
+            "GPA": "={{ $('Parse Score').item.json.GPA }}",
+            "CV Fit Notes": "={{ $('Parse Score').item.json.cv_fit_notes }}",
+            "GitHub Notes": "={{ $('Parse Score').item.json.github_notes }}",
+            "GPA Contribution": "={{ $('Parse Score').item.json.gpa_contribution }}",
+            "Overall Reasoning": "={{ $('Parse Score').item.json.overall_reasoning }}",
+            "GitHub URL": "={{ $('Parse Score').item.json['GitHub URL'] }}",
+            "LinkedIn URL": "={{ $('Parse Score').item.json['LinkedIn URL'] }}",
+            "Phone": "={{ $('Parse Score').item.json.Phone }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Name",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Email",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Phone",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Score",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV Fit Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "CV Fit Notes",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GitHub Notes",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA Contribution",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA Contribution",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall Reasoning",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Overall Reasoning",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GitHub URL",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "LinkedIn URL",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "38495d49-c4d3-43a3-9261-49370a52de4b",
+      "name": "Append to Video Editing",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -5056,
+        1824
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Game Development"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Parse Score').item.json.Name }}",
+            "Email": "={{ $('Parse Score').item.json.Email }}",
+            "Score": "={{ $('Parse Score').item.json.score }}",
+            "GPA": "={{ $('Parse Score').item.json.GPA }}",
+            "CV Fit Notes": "={{ $('Parse Score').item.json.cv_fit_notes }}",
+            "GitHub Notes": "={{ $('Parse Score').item.json.github_notes }}",
+            "GPA Contribution": "={{ $('Parse Score').item.json.gpa_contribution }}",
+            "Overall Reasoning": "={{ $('Parse Score').item.json.overall_reasoning }}",
+            "GitHub URL": "={{ $('Parse Score').item.json['GitHub URL'] }}",
+            "LinkedIn URL": "={{ $('Parse Score').item.json['LinkedIn URL'] }}",
+            "Phone": "={{ $('Parse Score').item.json.Phone }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Name",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Email",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Phone",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Score",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CV Fit Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "CV Fit Notes",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GitHub Notes",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA Contribution",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA Contribution",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall Reasoning",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Overall Reasoning",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GitHub URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GitHub URL",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn URL",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "LinkedIn URL",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "3ef7697a-458f-47d5-b843-3e4e26afa7ec",
+      "name": "Append to Game Dev",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4848,
+        1824
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Master Response"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "row_number"
+          ],
+          "value": {
+            "row_number": "={{ $('Loop Over Candidates').item.json['row_number'] }}",
+            "Status": "Disqualified — GPA below 3",
+            "Processed": "TRUE"
+          },
+          "schema": [
+            {
+              "id": "row_number",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "row_number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Status",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Processed",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Processed",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "b2b10937-32e5-4c82-9fdb-98b0f171854e",
+      "name": "Mark Disqualified",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4896,
+        2160
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "id": "0b5a2965-b4ca-49af-91de-9ca0adc41745",
+      "name": "Merge Top Candidates",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        -4320,
+        1440
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "hiring-team@example.com",
+        "subject": "[HR] Approve offer letters + candidate calls",
+        "message": "={{ 'All role digests have been sent. ' + $json.length + ' shortlisted candidates are attached in the sheets. Click Approve to send offer letters and start calling shortlisted candidates.' }}",
+        "options": {}
+      },
+      "id": "323869d0-d919-4435-bb89-23aff2680f07",
+      "name": "Approval - Send Offers & Call",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -3984,
+        1776
+      ],
+      "webhookId": "92010efb-bf13-4cd0-b2df-322eaca68d84",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sa9oA5RWMLTFqcBT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "b9831101-0d17-4abc-b3b9-378d5a4a013e",
+      "name": "Loop Approved Candidates",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -3792,
+        1776
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "You have been selected for our Internship Program",
+        "message": "={{ 'Dear ' + $json.Name + ',<br><br>Congratulations! You have been selected for our Internship Program (' + $json['Role Applied For'] + ').<br><br>Please find your offer letter attached / linked below.<br><br>WhatsApp group for onboarding: https://chat.whatsapp.com/REPLACE_WITH_GROUP_LINK<br><br>Regards,<br>Hiring Team' }}",
+        "options": {}
+      },
+      "id": "82d91c18-2923-4963-827d-a2988d13767e",
+      "name": "Send Offer Letter",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        -3552,
+        1792
+      ],
+      "webhookId": "35f9f629-1ed6-47c7-a0e7-1068550d3a00",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "sa9oA5RWMLTFqcBT",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.vapi.ai/call",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({\n  assistantId: 'Assitant ID here ',\n  customer: { number: $json['Phone'] },\n  assistantOverrides: {\n    variableValues: { candidateName: $json.Name, role: $json['Role Applied For'] }\n  }\n}) }}",
+        "options": {}
+      },
+      "id": "4cef5fca-d55e-4bf3-a836-3018d33b23b2",
+      "name": "Call Candidate (Vapi)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -3792,
+        1616
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "eLOXRQIhiLPBPQnL",
+          "name": "Header Auth account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "vapi-call-outcome",
+        "options": {}
+      },
+      "id": "1c254d0d-ad0e-434e-8ad8-cfeca6559495",
+      "name": "Vapi Call Outcome Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -5280,
+        2640
+      ],
+      "webhookId": "f4dfbb81-d0f6-47fe-8ccc-a590e2a6ce5e"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $json.body || $json;\nconst call = b.message?.call || b.call || {};\nconst analysis = b.message?.analysis || b.analysis || {};\nconst structured = analysis.structuredData || {};\nreturn [{ json: {\n  Name: structured.candidateName || call?.assistantOverrides?.variableValues?.candidateName || '',\n  Phone: call?.customer?.number || '',\n  PickedUp: structured.pickedUp === true || structured.pickedUp === 'true' ? 'Yes' : 'No',\n  Notes: structured.notes || analysis.summary || ''\n} }];"
+      },
+      "id": "fbb44b36-7b8f-47b5-9107-093d58f4b2b5",
+      "name": "Parse Call Outcome",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -5120,
+        2640
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Call Log"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.Name }}",
+            "Phone": "={{ $json.Phone }}",
+            "Picked Up": "={{ $json.PickedUp }}",
+            "Notes": "={{ $json.Notes }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Name",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Phone",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Picked Up",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Picked Up",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Notes",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Notes",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "a6ff03d2-3226-448a-8cad-d21baea898ee",
+      "name": "Log Call Outcome",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4944,
+        2640
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/117b649Se7l8HTVWidh-nsHWy11hXulXleWzZvtaVlKA/edit",
+          "cachedResultName": "HR_Workflow_with_Calling_Agent"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Manual Review"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $('Parse Score').item.json.Name }}",
+            "Email": "={{ $('Parse Score').item.json.Email }}",
+            "Phone": "={{ $('Parse Score').item.json.Phone }}",
+            "GPA": "={{ $('Parse Score').item.json.GPA }}",
+            "Role Applied For": "={{ $('Parse Score').item.json['Role Applied For'] }}",
+            "Score": "={{ $('Parse Score').item.json.score }}",
+            "Overall Reasoning": "={{ $('Parse Score').item.json.overall_reasoning }}"
+          },
+          "schema": [
+            {
+              "id": "Name",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Name",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Email",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Phone",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "GPA",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "GPA",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Role Applied For",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Role Applied For",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Score",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Score",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Overall Reasoning",
+              "type": "string",
+              "display": true,
+              "required": false,
+              "displayName": "Overall Reasoning",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "id": "eb233a53-378e-4d84-ba62-2b33e2aebe7f",
+      "name": "Append to Manual Review",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4640,
+        1824
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "JCRKmQJP6aVDBjmU",
+          "name": "Google Sheets account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "21142cd5-4dac-4be0-98b0-76830909a066",
+      "name": "Has Candidates - Ai / ML",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -5408,
+        1600
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "1a5537f2-9d7c-4f67-bab0-2630a439a90b",
+      "name": "Has Candidates - Full Stack",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -4464,
+        1584
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7bee2bf9-1f05-4f71-8189-2b5432a89796",
+      "name": "Has Candidates - Video Editing",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3184,
+        2032
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "combinator": "and",
+          "conditions": [
+            {
+              "leftValue": "={{ $json.skip }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "notEquals"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a6777ef9-4fdb-42be-a0b4-53f9f9ca6f9d",
+      "name": "Has Candidates - Game Dev",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -3168,
+        2240
+      ]
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 848,
+        "width": 1536
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5568,
+        1776
+      ],
+      "typeVersion": 1,
+      "id": "ee3a9f1e-1aec-41aa-83ac-f68b938ddb8a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 368,
+        "width": 1072,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -5568,
+        1408
+      ],
+      "typeVersion": 1,
+      "id": "c01a5e9f-715e-4bae-80e5-e07c464430ea",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 384,
+        "width": 640,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4032,
+        1616
+      ],
+      "typeVersion": 1,
+      "id": "d31a5800-8bd6-47a2-aa85-60324ce87ca4",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "",
+        "height": 608,
+        "width": 1072,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -4032,
+        2000
+      ],
+      "typeVersion": 1,
+      "id": "d4ec4b52-bbb9-463c-b802-63f596dd6459",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Run HR Screening": {
+      "main": [
+        [
+          {
+            "node": "Read Master Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Master Sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "All Candidates Processed": {
+      "main": [
+        [
+          {
+            "node": "Read Ai / ML Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Ai / ML Sheet": {
+      "main": [
+        [
+          {
+            "node": "Sort Ai / ML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort Ai / ML": {
+      "main": [
+        [
+          {
+            "node": "Top 3 Ai / ML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 3 Ai / ML": {
+      "main": [
+        [
+          {
+            "node": "Digest Ai / ML",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Top Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Digest Ai / ML": {
+      "main": [
+        [
+          {
+            "node": "Has Candidates - Ai / ML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Ai / ML": {
+      "main": [
+        [
+          {
+            "node": "Read Full Stack Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Full Stack Sheet": {
+      "main": [
+        [
+          {
+            "node": "Sort Full Stack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort Full Stack": {
+      "main": [
+        [
+          {
+            "node": "Top 3 Full Stack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 3 Full Stack": {
+      "main": [
+        [
+          {
+            "node": "Digest Full Stack",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Top Candidates",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Digest Full Stack": {
+      "main": [
+        [
+          {
+            "node": "Has Candidates - Full Stack",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Full Stack": {
+      "main": [
+        [
+          {
+            "node": "Read Video Editing Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Video Editing Sheet": {
+      "main": [
+        [
+          {
+            "node": "Sort Video Editing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort Video Editing": {
+      "main": [
+        [
+          {
+            "node": "Top 3 Video Editing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 3 Video Editing": {
+      "main": [
+        [
+          {
+            "node": "Digest Video Editing",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Top Candidates",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Digest Video Editing": {
+      "main": [
+        [
+          {
+            "node": "Has Candidates - Video Editing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Email Video Editing": {
+      "main": [
+        [
+          {
+            "node": "Read Game Dev Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Game Dev Sheet": {
+      "main": [
+        [
+          {
+            "node": "Sort Game Dev",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort Game Dev": {
+      "main": [
+        [
+          {
+            "node": "Top 3 Game Dev",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Top 3 Game Dev": {
+      "main": [
+        [
+          {
+            "node": "Digest Game Dev",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Top Candidates",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Digest Game Dev": {
+      "main": [
+        [
+          {
+            "node": "Has Candidates - Game Dev",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download CV": {
+      "main": [
+        [
+          {
+            "node": "Extract CV Text",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract CV Text": {
+      "main": [
+        [
+          {
+            "node": "Get GitHub Repos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get GitHub Repos": {
+      "main": [
+        [
+          {
+            "node": "Summarize GitHub",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize GitHub": {
+      "main": [
+        [
+          {
+            "node": "GPA >= 3?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPA >= 3?": {
+      "main": [
+        [
+          {
+            "node": "Score Candidate",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Disqualified",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Score Candidate": {
+      "main": [
+        [
+          {
+            "node": "Parse Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Score": {
+      "main": [
+        [
+          {
+            "node": "Mark Scored",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Scored": {
+      "main": [
+        [
+          {
+            "node": "Route by Role",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Role": {
+      "main": [
+        [
+          {
+            "node": "Append to Ai / ML",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append to Full Stack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append to Video Editing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append to Game Dev",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append to Manual Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Ai / ML": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Candidates": {
+      "main": [
+        [
+          {
+            "node": "All Candidates Processed",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download CV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Full Stack": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Video Editing": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Game Dev": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Disqualified": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Top Candidates": {
+      "main": [
+        [
+          {
+            "node": "Approval - Send Offers & Call",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approval - Send Offers & Call": {
+      "main": [
+        [
+          {
+            "node": "Loop Approved Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Approved Candidates": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send Offer Letter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Offer Letter": {
+      "main": [
+        [
+          {
+            "node": "Call Candidate (Vapi)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Candidate (Vapi)": {
+      "main": [
+        [
+          {
+            "node": "Loop Approved Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vapi Call Outcome Webhook": {
+      "main": [
+        [
+          {
+            "node": "Parse Call Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Call Outcome": {
+      "main": [
+        [
+          {
+            "node": "Log Call Outcome",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append to Manual Review": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Candidates - Ai / ML": {
+      "main": [
+        [
+          {
+            "node": "Email Ai / ML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Candidates - Full Stack": {
+      "main": [
+        [
+          {
+            "node": "Email Full Stack",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call Candidate (Vapi)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Candidates - Video Editing": {
+      "main": [
+        [
+          {
+            "node": "Email Video Editing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has Candidates - Game Dev": {
+      "main": [
+        [
+          {
+            "node": "Email Game Dev",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "2f4277ab-83f2-462c-96ff-cc0c55a83b54",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "e54051279f7c63ce586e8955981d44653d51cc52a03a0694e5078e0ee2b9bbed"
+  },
+  "nodeGroups": [],
+  "id": "hP3gc0olo4ovjTGr",
+  "tags": []
+}
